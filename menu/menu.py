@@ -1,13 +1,20 @@
 from systeme.FondMarin import *
 from ui.bouton.bouton import Bouton
+from ui.bouton.grille import Grille
 from menu.bulle import Bulle
 from random import randint
+from getpixelcolor import pixel
 
 class Menu:
     def __init__(self) -> None:
         self.alea()
+        self.pipetteON = False
         # Boutons
+        self.btPipette = Bouton(TB1o, BTV, "Pipette", '', [self.pipette])
         self.btHasard = Bouton(TB1o, BTV, "Nouveau", '', [self.alea])
+        self.grille = Grille(int(xf*0.45), [False])
+        self.grille.ajouteElement(self.btPipette, 0, 0)
+        self.grille.ajouteElement(self.btHasard, 1, 0)
         # Bulles
         self.rouge = Bulle(RED)
         self.vert = Bulle(GREEN)
@@ -43,7 +50,7 @@ class Menu:
         self.vert.dessine(int(xf/2-self.vert.getDims()[0]/2), y)
         self.bleu.dessine(int(xf/2+espace+self.vert.getDims()[0]/2), y)
         # options
-        self.btHasard.dessine(int(xf/2), int(yf*0.70))
+        self.grille.dessine(int(xf/2-self.grille.largeur/2), int(yf*0.70-self.grille.hauteur/2))
         # numéro de version
         taille = int(yf*0.03)
         tv = measure_text_ex(police3i, version, taille, 0)
@@ -51,6 +58,10 @@ class Menu:
                     (0, 0), 0, taille, 0, GRAY)
         if is_key_pressed(32):
             self.alea()
+        if self.pipetteON:
+            if is_mouse_button_pressed(0):
+                self.couleur = [int(get_mouse_x()*255/get_monitor_width(0)), 0, 0, 255]
+                self.pipetteON = False
 
     def dessineValeur(self, x: int, y: int, valeur: str) -> tuple[int]:
         largeur = int(xf*0.35)
@@ -62,6 +73,14 @@ class Menu:
 
     def alea(self) -> None:
         self.couleur = [randint(0, 255), randint(0, 255), randint(0, 255), 255]
+
+    def pipette(self) -> None:
+        self.pipetteON = True
+        """couleur = pixel(get_mouse_x(), get_mouse_y())
+        self.couleur = []
+        for i in range(3):
+            self.couleur.append(couleur[i])
+        self.couleur.append(255)"""
 
     # Between the worlds
     def portailBoreal(self) -> None:
